@@ -1,0 +1,41 @@
+server:
+  port: 8080
+
+
+spring:
+  application:
+    name: eghtax
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/eghtax?characterEncoding=UTF-8&serverTimezone=UTC&useUnicode=true&useSSL=false
+      username: root
+      password: sylym321
+  mail:
+    host: smtp.qq.com
+    protocol: smtps
+    username: 2479711422@qq.com
+    password: hyfaxtomhlniebdi
+    port: 465
+    properties:
+      mail:
+        smtp:
+          socketFactort:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
+            fallback: false
+  redis:
+    host: localhost
+    port: 6379
+
+mybatis-plus:
+  configuration:
+    #在映射实体或属性时，将数据表名与字段名的下划线去掉，按照驼峰命名
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID
+
+img:
+  path: E:\11\
