@@ -47,21 +47,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
         if (shoppingCarts == null || shoppingCarts.size() == 0) {
             throw new CustomException("购物车为空，不能下单");
         }
-
         //查询用户数据
         User user = userService.getById(userId);
-
         //查询地址数据
         String addressBookId = orders.getUserAddId();
         AddressBook addressBook = addressBookService.getById(addressBookId);
         if (addressBook == null) {
-            throw new CustomException("用户地址信息有误，不能下单");
+            throw new CustomException("用户地址信息有误，无法下单");
         }
-
         long orderId = IdWorker.getId();//订单号
-
         AtomicInteger amount = new AtomicInteger(0);
-
         List<OrderDetail> orderDetails = shoppingCarts.stream().map((item) -> {
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.setOrderId(orderId);
@@ -75,8 +70,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
             amount.addAndGet(item.getAmount().multiply(new BigDecimal(item.getNumber())).intValue());
             return orderDetail;
         }).collect(Collectors.toList());
-
-
         orders.setId(orderId);
         orders.setUserStatus(2);
         orders.setUserAmount(new BigDecimal(amount.get()));//总金额
@@ -84,7 +77,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
         orders.setUserOrderTime(LocalDateTime.now());
         orders.setUserId(userId);
         orders.setUserRemark(orders.getUserRemark());
-        orders.setUserName("user1");
+        orders.setUserName("users");
         orders.setUserConsignee(addressBook.getConsignee());
         orders.setUserPhone(addressBook.getPhone());
         orders.setUserAddress((addressBook.getProvinceName() == null ? "" : addressBook.getProvinceName())
@@ -93,10 +86,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
                 + (addressBook.getDetail() == null ? "" : addressBook.getDetail()));
         //向订单表插入数据，一条数据
         this.save(orders);
-
         //向订单明细表插入数据，多条数据
         orderDetailService.saveBatch(orderDetails);
-
         //清空购物车数据
         shoppingCartService.remove(wrapper);
     }
