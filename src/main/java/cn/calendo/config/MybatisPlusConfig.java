@@ -25,17 +25,4 @@ public class MybatisPlusConfig {
         mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor());
         return mybatisPlusInterceptor;
     }
-
-//    @Bean
-//    public MybatisSqlSessionFactoryBean sqlSessionFactory(DataSource dataSource) throws IOException {
-//        MybatisSqlSessionFactoryBean mybatisPlus = new MybatisSqlSessionFactoryBean();
-//        //加载数据源
-//        mybatisPlus.setDataSource(dataSource);
-//        //全局配置
-//        GlobalConfig globalConfig = new GlobalConfig();
-//        //配置填充器
-//        globalConfig.setMetaObjectHandler(new MyMetaObjectHandler());
-//        mybatisPlus.setGlobalConfig(globalConfig);
-//        return mybatisPlus;
-//    }
 }
