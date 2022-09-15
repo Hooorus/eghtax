@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.concurrent.TimeUnit;
 
 /**
  * interface user's implementing
@@ -55,13 +56,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String s = JSON.toJSONString(user);
         JSONObject jsonObject = JSON.parseObject(s);
         String email = jsonObject.getString("email");
-        //generate & send 4 digit v-code
+        //generate & send 6 digit v-code
         if (email != null) {
             Integer code = validateCodeUtils.generateValidateCode(6);
             String from = "2479711422@qq.com";
             String codeMail = vCodeMailSenderUtils.sendVCodeMail(code, from, email);
-            //inject validate code (key-value pair) to redis
-            redis.opsForValue().set("VCode", codeMail);
+            //inject validate code (key-value pair) to redis set 10min
+            redis.opsForValue().set("VCode", codeMail, 10, TimeUnit.MINUTES);
             return R.success(codeMail);
         } else {
             return R.error("can not send vcode mail!");
@@ -98,6 +99,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         } else {
             return R.error("验证码错误！");
         }
+        //if login success, delete vcode in redis
+        redis.delete("VCode");
         return R.success(user);
     }
 }

@@ -1,6 +1,7 @@
 package cn.calendo.service.impl;
 
 import cn.calendo.common.CustomException;
+import cn.calendo.common.R;
 import cn.calendo.dto.DishDto;
 import cn.calendo.mapper.DishMapper;
 import cn.calendo.pojo.Category;
@@ -17,11 +18,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +45,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 菜品的分页查询（需要BU双表查询）
@@ -178,11 +185,23 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     /**
      * 添加套餐内添加菜品里每种菜品的分类（前后台复用）
+     *
      * @param dish
      * @return
      */
     @Override
     public List<DishDto> selectDishList(Dish dish) {
+//        //set dishDtoList as null
+//        List<DishDto> dishDtoList = null;
+//        //construct key(dish name)
+//        String key = "dish" + dish.getCategoryId();
+//        //get redis cache
+//        dishDtoList = (List<DishDto>) redisTemplate.opsForValue().get(key);
+//        //if exists, no sql
+//        if (dishDtoList != null) {
+//            return dishDtoList;
+//        }
+//        //if not exists, sql & caching to redis
         QueryWrapper<Dish> qw = new QueryWrapper<>();
         qw.eq(dish.getCategoryId() != null, "category_id", dish.getCategoryId());
         qw.orderByAsc("sort").orderByDesc("update_time");
@@ -203,6 +222,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             dishDto.setFlavors(dishFlavorList);
             return dishDto;
         }).collect(Collectors.toList());
+
+//        redisTemplate.opsForValue().set(key, dishDtoList, 2, TimeUnit.HOURS);
+
         return dishDtoList;
     }
 

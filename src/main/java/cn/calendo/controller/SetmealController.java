@@ -108,4 +108,10 @@ public class SetmealController {
         List<Setmeal> mealList = setmealService.getMealList(setmeal);
         return R.success(mealList);
     }
+
+    @GetMapping("/dish/{id}")
+    public R<SetmealDto> getMeal2Order(@PathVariable Long id) {
+        SetmealDto mealDish = setmealService.getMealDish(id);
+        return R.success(mealDish);
+    }
 }
