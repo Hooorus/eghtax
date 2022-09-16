@@ -16,6 +16,8 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,9 +39,6 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
     @Autowired
     private CategoryService categoryService;
-
-    @Autowired
-    private RedisTemplate redisTemplate;
 
     /**
      * 套餐页面分页查询（BU双页查询）
@@ -108,6 +107,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
      * @param setmeal
      */
     @Override
+    @CacheEvict(value = "mealListCache", allEntries = true)
     public void updateStatus(@NonNull Setmeal setmeal) {
         QueryWrapper<Setmeal> qw = new QueryWrapper<>();
         qw.eq("id", setmeal.getId());
@@ -140,6 +140,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
      * @param setmealDto
      */
     @Override
+    @CacheEvict(value = "mealListCache", allEntries = true)
     public void updateSetmealWithDish(SetmealDto setmealDto) {
         //更新stemeal表
         this.updateById(setmealDto);
@@ -162,6 +163,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
      * @param id
      */
     @Override
+    @CacheEvict(value = "mealListCache", allEntries = true)
     public void deleteMeal(@NonNull String id) {
         String[] splitId = id.split(",");
         //看看下面有没有菜品，能不能删除
@@ -191,6 +193,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
      * @return
      */
     @Override
+    @Cacheable(value = "mealListCache", key = "#setmeal.categoryId + '_' + #setmeal.status")
     public List<Setmeal> getMealList(Setmeal setmeal) {
         QueryWrapper<Setmeal> qw = new QueryWrapper<>();
         qw.eq("category_id", setmeal.getCategoryId());
