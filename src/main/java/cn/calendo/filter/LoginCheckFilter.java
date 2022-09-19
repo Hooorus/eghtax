@@ -40,7 +40,11 @@ public class LoginCheckFilter implements Filter {
                 "/favicon.ico",
                 "front/**",
                 "common/**",
-                "/user/**"
+                "/user/**",
+                "/doc.html",
+                "/webjars/**",
+                "/swagger-resources",
+                "/v2/api-docs"
         };
 
         //3.判断本次请求是否需要处理
