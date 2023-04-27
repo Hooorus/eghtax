@@ -6,7 +6,6 @@ spring:
   application:
     name: eghtax
   shardingsphere:
-
     datasource:
       names:
         master,slave
